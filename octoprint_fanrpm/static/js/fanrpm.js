@@ -32,21 +32,21 @@ $(function() {
         // Statistics
         self.averageRPM = ko.pureComputed(function() {
             var history = self.rpmHistory();
-            if (history.length === 0) return 0;
+            if (history.length === 0) return "0";
             var sum = history.reduce(function(a, b) { return a + b; }, 0);
-            return Math.round(sum / history.length);
+            return Math.round(sum / history.length).toLocaleString();
         });
 
         self.minRPM = ko.pureComputed(function() {
             var history = self.rpmHistory();
-            if (history.length === 0) return 0;
-            return Math.min.apply(null, history);
+            if (history.length === 0) return "0";
+            return Math.min.apply(null, history).toLocaleString();
         });
 
         self.maxRPM = ko.pureComputed(function() {
             var history = self.rpmHistory();
-            if (history.length === 0) return 0;
-            return Math.max.apply(null, history);
+            if (history.length === 0) return "0";
+            return Math.max.apply(null, history).toLocaleString();
         });
 
         // Handle messages from plugin

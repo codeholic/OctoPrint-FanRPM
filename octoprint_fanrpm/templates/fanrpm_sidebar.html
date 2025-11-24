@@ -19,19 +19,19 @@
         <table class="table table-condensed">
             <tr>
                 <td><strong>Current:</strong></td>
-                <td data-bind="text: formattedRPM() + ' RPM'"></td>
+                <td><span data-bind="text: formattedRPM"></span> RPM</td>
             </tr>
             <tr>
                 <td><strong>Average:</strong></td>
-                <td data-bind="text: averageRPM().toLocaleString() + ' RPM'"></td>
+                <td><span data-bind="text: averageRPM"></span> RPM</td>
             </tr>
             <tr>
                 <td><strong>Min:</strong></td>
-                <td data-bind="text: minRPM().toLocaleString() + ' RPM'"></td>
+                <td><span data-bind="text: minRPM"></span> RPM</td>
             </tr>
             <tr>
                 <td><strong>Max:</strong></td>
-                <td data-bind="text: maxRPM().toLocaleString() + ' RPM'"></td>
+                <td><span data-bind="text: maxRPM"></span> RPM</td>
             </tr>
         </table>
     </div>

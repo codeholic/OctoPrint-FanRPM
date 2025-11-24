@@ -83,7 +83,7 @@ class FanRPMPlugin(octoprint.plugin.StartupPlugin,
         try:
             GPIO.setmode(GPIO.BCM)
             GPIO.setup(self.tach_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-            GPIO.add_event_detect(self.tach_pin, GPIO.FALLING, 
+            GPIO.add_event_detect(self.tach_pin, GPIO.FALLING,
                                   callback=self.tach_callback,
                                   bouncetime=5)
             self._logger.info(f"GPIO {self.tach_pin} configured successfully")

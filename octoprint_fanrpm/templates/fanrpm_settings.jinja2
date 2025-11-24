@@ -1,0 +1,35 @@
+<h4>Fan RPM Monitor Settings</h4>
+
+<form class="form-horizontal">
+    <div class="control-group">
+        <label class="control-label">{{ _('Enable Monitoring') }}</label>
+        <div class="controls">
+            <input type="checkbox" class="input-block-level" data-bind="checked: settings.plugins.fanrpm.enabled">
+            <span class="help-inline">Enable or disable fan RPM monitoring</span>
+        </div>
+    </div>
+
+    <div class="control-group">
+        <label class="control-label">{{ _('Tachometer Pin (BCM)') }}</label>
+        <div class="controls">
+            <input type="number" class="input-block-level" data-bind="value: settings.plugins.fanrpm.tach_pin">
+            <span class="help-inline">GPIO pin number in BCM mode (default: 14 = Pin 8)</span>
+        </div>
+    </div>
+
+    <div class="control-group">
+        <label class="control-label">{{ _('Pulses per Revolution') }}</label>
+        <div class="controls">
+            <input type="number" class="input-block-level" data-bind="value: settings.plugins.fanrpm.pulses_per_rev">
+            <span class="help-inline">Number of pulses per fan revolution (usually 2)</span>
+        </div>
+    </div>
+
+    <div class="control-group">
+        <label class="control-label">{{ _('Update Interval (seconds)') }}</label>
+        <div class="controls">
+            <input type="number" step="0.1" class="input-block-level" data-bind="value: settings.plugins.fanrpm.update_interval">
+            <span class="help-inline">How often to update RPM readings</span>
+        </div>
+    </div>
+</form>

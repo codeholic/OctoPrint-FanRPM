@@ -1,0 +1,74 @@
+<div id="sidebar_plugin_fanrpm" class="fanrpm-sidebar">
+    <h3>Fan RPM</h3>
+    
+    <div class="rpm-display">
+        <div class="rpm-value" data-bind="css: 'label-' + rpmStatus()">
+            <i class="fa fa-refresh fa-spin" data-bind="visible: currentRPM() > 0"></i>
+            <span data-bind="text: formattedRPM"></span>
+            <small>RPM</small>
+        </div>
+        <div class="rpm-status">
+            <span class="label" data-bind="css: 'label-' + rpmStatus(), text: statusText"></span>
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="rpm-stats">
+        <h4>Statistics</h4>
+        <table class="table table-condensed">
+            <tr>
+                <td><strong>Current:</strong></td>
+                <td data-bind="text: formattedRPM() + ' RPM'"></td>
+            </tr>
+            <tr>
+                <td><strong>Average:</strong></td>
+                <td data-bind="text: averageRPM().toLocaleString() + ' RPM'"></td>
+            </tr>
+            <tr>
+                <td><strong>Min:</strong></td>
+                <td data-bind="text: minRPM().toLocaleString() + ' RPM'"></td>
+            </tr>
+            <tr>
+                <td><strong>Max:</strong></td>
+                <td data-bind="text: maxRPM().toLocaleString() + ' RPM'"></td>
+            </tr>
+        </table>
+    </div>
+
+    <style>
+        .fanrpm-sidebar .rpm-display {
+            text-align: center;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .fanrpm-sidebar .rpm-value {
+            font-size: 48px;
+            font-weight: bold;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        
+        .fanrpm-sidebar .rpm-value small {
+            font-size: 16px;
+            display: block;
+            font-weight: normal;
+        }
+        
+        .fanrpm-sidebar .rpm-status {
+            margin-top: 10px;
+        }
+        
+        .fanrpm-sidebar .rpm-stats {
+            margin-top: 10px;
+        }
+        
+        .fanrpm-sidebar .rpm-stats h4 {
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+    </style>
+</div>

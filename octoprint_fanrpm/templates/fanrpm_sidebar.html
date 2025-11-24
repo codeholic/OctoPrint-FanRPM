@@ -2,13 +2,13 @@
     <h3>Fan RPM</h3>
     
     <div class="rpm-display">
-        <div class="rpm-value" data-bind="css: 'label-' + rpmStatus()">
+        <div class="rpm-value">
             <i class="fa fa-refresh fa-spin" data-bind="visible: currentRPM() > 0"></i>
-            <span data-bind="text: formattedRPM"></span>
+            <span data-bind="text: formattedRPM, css: rpmStatus"></span>
             <small>RPM</small>
         </div>
         <div class="rpm-status">
-            <span class="label" data-bind="css: 'label-' + rpmStatus(), text: statusText"></span>
+            <span class="label" data-bind="text: statusText, css: rpmStatus"></span>
         </div>
     </div>
 
@@ -44,31 +44,55 @@
             border-radius: 5px;
             margin-bottom: 10px;
         }
-        
+
         .fanrpm-sidebar .rpm-value {
             font-size: 48px;
             font-weight: bold;
             padding: 10px;
             border-radius: 5px;
         }
-        
+
         .fanrpm-sidebar .rpm-value small {
             font-size: 16px;
             display: block;
             font-weight: normal;
         }
-        
+
         .fanrpm-sidebar .rpm-status {
             margin-top: 10px;
         }
-        
+
         .fanrpm-sidebar .rpm-stats {
             margin-top: 10px;
         }
-        
+
         .fanrpm-sidebar .rpm-stats h4 {
             margin-top: 0;
             margin-bottom: 10px;
+        }
+
+        .fanrpm-sidebar .success {
+            color: #468847;
+        }
+
+        .fanrpm-sidebar .warning {
+            color: #f89406;
+        }
+
+        .fanrpm-sidebar .danger {
+            color: #b94a48;
+        }
+
+        .fanrpm-sidebar .label-success {
+            background-color: #468847;
+        }
+
+        .fanrpm-sidebar .label-warning {
+            background-color: #f89406;
+        }
+
+        .fanrpm-sidebar .label-danger {
+            background-color: #b94a48;
         }
     </style>
 </div>

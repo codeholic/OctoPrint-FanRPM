@@ -17,9 +17,9 @@ $(function() {
         // Status indicator
         self.rpmStatus = ko.pureComputed(function() {
             var rpm = self.currentRPM();
-            if (rpm === 0) return "danger";
-            if (rpm < 500) return "warning";
-            return "success";
+            if (rpm === 0) return "label-danger";
+            if (rpm < 500) return "label-warning";
+            return "label-success";
         });
 
         self.statusText = ko.pureComputed(function() {

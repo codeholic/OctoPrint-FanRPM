@@ -2,6 +2,8 @@ $(function() {
     function FanRPMViewModel(parameters) {
         var self = this;
 
+        console.log("FanRPM: ViewModel constructor called");
+
         self.settings = parameters[0];
         self.currentRPM = ko.observable(0);
         self.rpmHistory = ko.observableArray([]);
@@ -50,10 +52,12 @@ $(function() {
         // Handle messages from plugin
         self.onDataUpdaterPluginMessage = function(plugin, data) {
             if (plugin !== "fanrpm") return;
-            
+
+            console.log("FanRPM: Received message", data);
+
             if (data.rpm !== undefined) {
                 self.currentRPM(data.rpm);
-                
+
                 // Update history
                 self.rpmHistory.push(data.rpm);
                 if (self.rpmHistory().length > self.maxHistory) {
@@ -64,20 +68,26 @@ $(function() {
 
         // Request initial RPM
         self.requestRPM = function() {
+            console.log("FanRPM: Requesting initial RPM");
             $.ajax({
                 url: API_BASEURL + "plugin/fanrpm",
                 type: "GET",
                 dataType: "json",
                 success: function(response) {
+                    console.log("FanRPM: API response", response);
                     if (response.rpm !== undefined) {
                         self.currentRPM(response.rpm);
                     }
+                },
+                error: function(xhr, status, error) {
+                    console.error("FanRPM: API error", status, error);
                 }
             });
         };
 
         // Request RPM on startup
         self.onStartup = function() {
+            console.log("FanRPM: ViewModel started");
             self.requestRPM();
         };
     }

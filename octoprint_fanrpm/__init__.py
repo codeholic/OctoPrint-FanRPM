@@ -81,6 +81,13 @@ class FanRPMPlugin(octoprint.plugin.StartupPlugin,
     def setup_gpio(self):
         """Initialize GPIO"""
         try:
+            # Clean up any previous GPIO state first
+            try:
+                GPIO.cleanup(self.tach_pin)
+                self._logger.info(f"Cleaned up previous state for GPIO {self.tach_pin}")
+            except:
+                pass  # Ignore cleanup errors, pin might not be configured
+
             GPIO.setmode(GPIO.BCM)
             GPIO.setup(self.tach_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
             GPIO.add_event_detect(self.tach_pin, GPIO.FALLING,

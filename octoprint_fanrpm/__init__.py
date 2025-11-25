@@ -52,7 +52,7 @@ class FanRPMPlugin(octoprint.plugin.StartupPlugin,
         return [
             dict(type="sidebar",
                  name="Exhaust Fan",
-                 icon="fan",
+                 icon="tachometer",
                  custom_bindings=True),
             dict(type="settings",
                  custom_bindings=False)

@@ -12,8 +12,8 @@ $(function() {
         self.minRPMTime = ko.observable(null);
         self.maxRPMValue = ko.observable(null);
         self.maxRPMTime = ko.observable(null);
-        self.sumRPM = 0;
-        self.countRPM = 0;
+        self.sumRPM = ko.observable(0);
+        self.countRPM = ko.observable(0);
 
         self.currentTime = ko.observable(new Date());
 
@@ -42,10 +42,10 @@ $(function() {
 
         // Statistics
         self.averageRPM = ko.pureComputed(function() {
-            // Access currentRPM to trigger recomputation
-            self.currentRPM();
-            if (self.countRPM === 0) return "0";
-            return Math.round(self.sumRPM / self.countRPM).toLocaleString();
+            var count = self.countRPM();
+            var sum = self.sumRPM();
+            if (count === 0) return "0";
+            return Math.round(sum / count).toLocaleString();
         });
 
         self.minRPM = ko.pureComputed(function() {
@@ -132,8 +132,8 @@ $(function() {
                 self.currentRPM(rpm);
 
                 // Update aggregated statistics
-                self.sumRPM += rpm;
-                self.countRPM += 1;
+                self.sumRPM(self.sumRPM() + rpm);
+                self.countRPM(self.countRPM() + 1);
 
                 // Update min
                 if (self.minRPMValue() === null || rpm < self.minRPMValue()) {

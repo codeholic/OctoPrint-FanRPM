@@ -42,6 +42,8 @@ $(function() {
 
         // Statistics
         self.averageRPM = ko.pureComputed(function() {
+            // Access currentRPM to trigger recomputation
+            self.currentRPM();
             if (self.countRPM === 0) return "0";
             return Math.round(self.sumRPM / self.countRPM).toLocaleString();
         });

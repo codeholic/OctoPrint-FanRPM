@@ -165,12 +165,59 @@ $(function() {
                 return [relativeSeconds, entry.rpm];
             });
 
+            // Set fixed axis range and ticks based on time window (needed for threshold lines)
+            var minTime, maxTime = 0, ticks;
+            if (window === "1min") {
+                minTime = -60;
+                ticks = [-60, -50, -40, -30, -20, -10, 0];
+            } else if (window === "5min") {
+                minTime = -5 * 60;
+                ticks = [-5 * 60, -4 * 60, -3 * 60, -2 * 60, -1 * 60, 0];
+            } else {
+                minTime = -30 * 60;
+                ticks = [-30 * 60, -25 * 60, -20 * 60, -15 * 60, -10 * 60, -5 * 60, 0];
+            }
+
+            // Calculate statistics for threshold lines
+            var avg = 0, min = 0, max = 0;
+            if (filtered.length > 0) {
+                var sum = filtered.reduce(function(acc, entry) { return acc + entry.rpm; }, 0);
+                avg = sum / filtered.length;
+                min = Math.min.apply(null, filtered.map(function(entry) { return entry.rpm; }));
+                max = Math.max.apply(null, filtered.map(function(entry) { return entry.rpm; }));
+            }
+
             var dataset = [{
                 data: data,
                 color: "#468847",
                 lines: { show: true, lineWidth: 2 },
                 shadowSize: 0
             }];
+
+            // Add horizontal dashed lines for avg, min, max
+            if (filtered.length > 0) {
+                dataset.push({
+                    data: [[minTime, avg], [maxTime, avg]],
+                    color: "#468847",
+                    lines: { show: false },
+                    dashes: { show: true, lineWidth: 1, dashLength: 5 },
+                    shadowSize: 0
+                });
+                dataset.push({
+                    data: [[minTime, min], [maxTime, min]],
+                    color: "#b94a48",
+                    lines: { show: false },
+                    dashes: { show: true, lineWidth: 1, dashLength: 5 },
+                    shadowSize: 0
+                });
+                dataset.push({
+                    data: [[minTime, max], [maxTime, max]],
+                    color: "#3a87ad",
+                    lines: { show: false },
+                    dashes: { show: true, lineWidth: 1, dashLength: 5 },
+                    shadowSize: 0
+                });
+            }
 
             // Custom tick formatter for relative time
             var tickFormatter = function(val) {
@@ -189,19 +236,6 @@ $(function() {
                     return minutes + "m";
                 }
             };
-
-            // Set fixed axis range and ticks based on time window
-            var minTime, maxTime = 0, ticks;
-            if (window === "1min") {
-                minTime = -60;
-                ticks = [-60, -50, -40, -30, -20, -10, 0];
-            } else if (window === "5min") {
-                minTime = -5 * 60;
-                ticks = [-5 * 60, -4 * 60, -3 * 60, -2 * 60, -1 * 60, 0];
-            } else {
-                minTime = -30 * 60;
-                ticks = [-30 * 60, -25 * 60, -20 * 60, -15 * 60, -10 * 60, -5 * 60, 0];
-            }
 
             var options = {
                 xaxis: {

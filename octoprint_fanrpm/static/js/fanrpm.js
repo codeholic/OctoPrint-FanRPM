@@ -6,10 +6,15 @@ $(function() {
 
         self.settings = parameters[0];
         self.currentRPM = ko.observable(0);
-        self.rpmHistory = ko.observableArray([]);
-        self.maxHistory = 60;
+
+        // Aggregated statistics instead of full history
+        self.minRPMValue = ko.observable(null);
         self.minRPMTime = ko.observable(null);
+        self.maxRPMValue = ko.observable(null);
         self.maxRPMTime = ko.observable(null);
+        self.sumRPM = 0;
+        self.countRPM = 0;
+
         self.currentTime = ko.observable(new Date());
 
         // Format RPM with thousands separator
@@ -37,23 +42,19 @@ $(function() {
 
         // Statistics
         self.averageRPM = ko.pureComputed(function() {
-            var history = self.rpmHistory();
-            if (history.length === 0) return "0";
-            var sum = history.reduce(function(a, b) { return a + b; }, 0);
-            return Math.round(sum / history.length).toLocaleString();
+            if (self.countRPM === 0) return "0";
+            return Math.round(self.sumRPM / self.countRPM).toLocaleString();
         });
 
         self.minRPM = ko.pureComputed(function() {
-            var history = self.rpmHistory();
-            if (history.length === 0) return "0";
-            var minVal = Math.min.apply(null, history);
+            var minVal = self.minRPMValue();
+            if (minVal === null) return "0";
             return minVal.toLocaleString();
         });
 
         self.maxRPM = ko.pureComputed(function() {
-            var history = self.rpmHistory();
-            if (history.length === 0) return "0";
-            var maxVal = Math.max.apply(null, history);
+            var maxVal = self.maxRPMValue();
+            if (maxVal === null) return "0";
             return maxVal.toLocaleString();
         });
 
@@ -121,21 +122,24 @@ $(function() {
             console.log("FanRPM: Received message", data);
 
             if (data.rpm !== undefined) {
-                self.currentRPM(data.rpm);
-
-                // Update history
-                var history = self.rpmHistory();
-                self.rpmHistory.push(data.rpm);
-                if (self.rpmHistory().length > self.maxHistory) {
-                    self.rpmHistory.shift();
-                }
-
-                // Track min/max times
+                var rpm = data.rpm;
                 var now = new Date();
-                if (history.length === 0 || data.rpm <= Math.min.apply(null, history)) {
+
+                self.currentRPM(rpm);
+
+                // Update aggregated statistics
+                self.sumRPM += rpm;
+                self.countRPM += 1;
+
+                // Update min
+                if (self.minRPMValue() === null || rpm < self.minRPMValue()) {
+                    self.minRPMValue(rpm);
                     self.minRPMTime(now);
                 }
-                if (history.length === 0 || data.rpm >= Math.max.apply(null, history)) {
+
+                // Update max
+                if (self.maxRPMValue() === null || rpm > self.maxRPMValue()) {
+                    self.maxRPMValue(rpm);
                     self.maxRPMTime(now);
                 }
             }

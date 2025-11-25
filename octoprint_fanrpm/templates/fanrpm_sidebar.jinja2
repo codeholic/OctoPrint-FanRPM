@@ -1,98 +1,40 @@
 <div id="sidebar_plugin_fanrpm" class="fanrpm-sidebar">
-    <h3>Fan RPM</h3>
-    
-    <div class="rpm-display">
-        <div class="rpm-value">
-            <i class="fa fa-refresh fa-spin" data-bind="visible: currentRPM() > 0"></i>
-            <span data-bind="text: formattedRPM, css: rpmStatus"></span>
-            <small>RPM</small>
-        </div>
-        <div class="rpm-status">
-            <span class="label" data-bind="text: statusText, css: rpmStatus"></span>
-        </div>
-    </div>
-
-    <hr>
-
-    <div class="rpm-stats">
-        <h4>Statistics</h4>
-        <table class="table table-condensed">
-            <tr>
-                <td><strong>Current:</strong></td>
-                <td><span data-bind="text: formattedRPM"></span> RPM</td>
-            </tr>
-            <tr>
-                <td><strong>Average:</strong></td>
-                <td><span data-bind="text: averageRPM"></span> RPM</td>
-            </tr>
-            <tr>
-                <td><strong>Min:</strong></td>
-                <td><span data-bind="text: minRPM"></span> RPM</td>
-            </tr>
-            <tr>
-                <td><strong>Max:</strong></td>
-                <td><span data-bind="text: maxRPM"></span> RPM</td>
-            </tr>
-        </table>
-    </div>
+    Current: <i class="fa fa-fan" data-bind="css: fanIconClass"></i> <strong><span data-bind="text: formattedRPM, css: rpmStatusClass"></span> <span data-bind="css: rpmStatusClass">RPM</span></strong><br>
+    Average: <strong><span data-bind="text: averageRPM"></span> RPM</strong><br>
+    Min: <strong><span data-bind="text: minRPM"></span> RPM</strong><span data-bind="text: minRPMTimeFormatted, attr: {title: minRPMTimeAbsolute}"></span><br>
+    Max: <strong><span data-bind="text: maxRPM"></span> RPM</strong><span data-bind="text: maxRPMTimeFormatted, attr: {title: maxRPMTimeAbsolute}"></span>
 
     <style>
-        .fanrpm-sidebar .rpm-display {
-            text-align: center;
-            padding: 20px;
-            background: #f5f5f5;
-            border-radius: 5px;
-            margin-bottom: 10px;
-        }
-
-        .fanrpm-sidebar .rpm-value {
-            font-size: 48px;
-            font-weight: bold;
-            padding: 10px;
-            border-radius: 5px;
-        }
-
-        .fanrpm-sidebar .rpm-value small {
-            font-size: 16px;
-            display: block;
-            font-weight: normal;
-        }
-
-        .fanrpm-sidebar .rpm-status {
-            margin-top: 10px;
-        }
-
-        .fanrpm-sidebar .rpm-stats {
-            margin-top: 10px;
-        }
-
-        .fanrpm-sidebar .rpm-stats h4 {
-            margin-top: 0;
-            margin-bottom: 10px;
-        }
-
-        .fanrpm-sidebar .success {
+        .fanrpm-sidebar .rpm-status-ok {
             color: #468847;
         }
 
-        .fanrpm-sidebar .warning {
+        .fanrpm-sidebar .rpm-status-warning {
             color: #f89406;
         }
 
-        .fanrpm-sidebar .danger {
+        .fanrpm-sidebar .rpm-status-danger {
             color: #b94a48;
         }
 
-        .fanrpm-sidebar .label-success {
-            background-color: #468847;
+        /* Normal speed - 2s */
+        .fanrpm-sidebar .fan-spin-ok {
+            animation: fa-spin 2s infinite linear;
         }
 
-        .fanrpm-sidebar .label-warning {
-            background-color: #f89406;
+        /* Half speed - 4s */
+        .fanrpm-sidebar .fan-spin-warning {
+            animation: fa-spin 4s infinite linear;
         }
 
-        .fanrpm-sidebar .label-danger {
-            background-color: #b94a48;
+        /* Quarter speed - 8s */
+        .fanrpm-sidebar .fan-spin-slow {
+            animation: fa-spin 8s infinite linear;
+        }
+
+        /* No spin for 0 RPM */
+        .fanrpm-sidebar .fan-spin-stop {
+            /* no animation */
         }
     </style>
 </div>

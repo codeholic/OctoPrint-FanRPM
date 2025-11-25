@@ -51,8 +51,8 @@ class FanRPMPlugin(octoprint.plugin.StartupPlugin,
     def get_template_configs(self):
         return [
             dict(type="sidebar",
-                 name="Fan RPM",
-                 icon="refresh",
+                 name="Exhaust Fan",
+                 icon="fan",
                  custom_bindings=True),
             dict(type="settings",
                  custom_bindings=False)

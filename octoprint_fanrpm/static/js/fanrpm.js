@@ -144,6 +144,107 @@ $(function() {
         // Set time window
         self.setTimeWindow = function(window) {
             self.timeWindow(window);
+            self.updateGraph();
+        };
+
+        // Graph plotting
+        self.plot = null;
+        self.lastWindow = null; // Track last window to detect changes
+        self.updateGraph = function() {
+            var filtered = self.getFilteredData();
+
+            if (filtered.length === 0) {
+                if (self.plot) {
+                    self.plot.shutdown();
+                    self.plot = null;
+                }
+                return;
+            }
+
+            var now = new Date().getTime();
+            var window = self.timeWindow();
+
+            // Prepare data for Flot - use relative time in seconds
+            var data = filtered.map(function(entry) {
+                var relativeSeconds = (entry.time.getTime() - now) / 1000;
+                return [relativeSeconds, entry.rpm];
+            });
+
+            var dataset = [{
+                data: data,
+                color: "#468847",
+                lines: { show: true, lineWidth: 2 },
+                shadowSize: 0
+            }];
+
+            // Custom tick formatter for relative time
+            var tickFormatter = function(val) {
+                if (Math.abs(val) < 1) return "now";
+
+                if (window === "1min") {
+                    // For 1 min window, show seconds
+                    return Math.round(val) + "s";
+                } else {
+                    // For 5 min and 30 min windows, show minutes
+                    var minutes = Math.round(val / 60);
+                    if (minutes === 0 && Math.abs(val) >= 1) {
+                        // If less than 30 seconds but more than 1 second, show "-1m" or "1m"
+                        return (val < 0 ? "-1m" : "1m");
+                    }
+                    return minutes + "m";
+                }
+            };
+
+            // Set fixed axis range and ticks based on time window
+            var minTime, maxTime = 0, ticks;
+            if (window === "1min") {
+                minTime = -60;
+                ticks = [-60, -50, -40, -30, -20, -10, 0];
+            } else if (window === "5min") {
+                minTime = -5 * 60;
+                ticks = [-5 * 60, -4 * 60, -3 * 60, -2 * 60, -1 * 60, 0];
+            } else {
+                minTime = -30 * 60;
+                ticks = [-30 * 60, -25 * 60, -20 * 60, -15 * 60, -10 * 60, -5 * 60, 0];
+            }
+
+            var options = {
+                xaxis: {
+                    min: minTime,
+                    max: maxTime,
+                    ticks: ticks,
+                    tickFormatter: tickFormatter
+                },
+                yaxis: {
+                    min: 0,
+                    tickFormatter: function(val) {
+                        return val.toFixed(0);
+                    }
+                },
+                grid: {
+                    borderWidth: 1,
+                    borderColor: "#ddd",
+                    labelMargin: 8
+                },
+                legend: { show: false }
+            };
+
+            // Recreate plot only if window changed, otherwise just update data
+            var windowChanged = (self.lastWindow !== window);
+
+            if (windowChanged || !self.plot) {
+                // Window changed or first time - recreate plot with new options
+                if (self.plot) {
+                    self.plot.shutdown();
+                }
+                self.plot = $.plot("#fanrpm-graph", dataset, options);
+                self.lastWindow = window;
+            } else {
+                // Same window - just update data (much faster)
+                self.plot.setData(dataset);
+                self.plot.setupGrid();
+                self.plot.draw();
+            }
         };
 
         // Handle messages from plugin
@@ -168,6 +269,9 @@ $(function() {
                 if (self.rpmHistory().length > self.maxHistorySize) {
                     self.rpmHistory.shift();
                 }
+
+                // Update graph
+                self.updateGraph();
             }
         };
 

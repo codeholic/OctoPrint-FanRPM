@@ -70,7 +70,9 @@ $(function() {
             var diffMonths = Math.floor(diffDays / 30);
             var diffYears = Math.floor(diffDays / 365);
 
-            if (diffSecs < 60) {
+            if (diffSecs < 1) {
+                return "now";
+            } else if (diffSecs < 60) {
                 return diffSecs + " second" + (diffSecs !== 1 ? "s" : "") + " ago";
             } else if (diffMins < 60) {
                 return diffMins + " minute" + (diffMins !== 1 ? "s" : "") + " ago";

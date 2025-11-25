@@ -14,11 +14,6 @@ $(function() {
         // Time window selection
         self.timeWindow = ko.observable("1min"); // "1min", "5min", "30min"
 
-        // Format RPM with thousands separator
-        self.formattedRPM = ko.pureComputed(function() {
-            return self.currentRPM().toLocaleString();
-        });
-
         // Status indicator
         self.rpmStatusClass = ko.pureComputed(function() {
             var rpm = self.currentRPM();
@@ -68,7 +63,7 @@ $(function() {
                 return acc + entry.rpm;
             }, 0);
 
-            return Math.round(sum / filtered.length).toLocaleString();
+            return Math.round(sum / filtered.length);
         });
 
         self.minRPM = ko.pureComputed(function() {
@@ -81,7 +76,7 @@ $(function() {
                 return entry.rpm;
             }));
 
-            return min.toLocaleString();
+            return min;
         });
 
         self.maxRPM = ko.pureComputed(function() {
@@ -94,7 +89,7 @@ $(function() {
                 return entry.rpm;
             }));
 
-            return max.toLocaleString();
+            return max;
         });
 
         // Status classes for statistics (only show color for warnings/errors)

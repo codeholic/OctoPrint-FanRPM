@@ -1,15 +1,19 @@
 <div id="sidebar_plugin_fanrpm" class="fanrpm-sidebar">
-    Current: <i class="fa fa-fan" data-bind="css: fanIconClass"></i> <strong><span data-bind="text: formattedRPM, css: rpmStatusClass"></span> <span data-bind="css: rpmStatusClass">RPM</span></strong><br>
+    Current: <i class="fa fa-fan" data-bind="css: fanIconClass"></i> <strong><span data-bind="text: currentRPM, css: rpmStatusClass"></span> <span data-bind="css: rpmStatusClass">RPM</span></strong><br>
     <hr style="margin: 8px 0;">
     <div class="btn-group btn-group-xs" data-toggle="buttons-radio" style="margin-bottom: 8px;">
         <button type="button" class="btn btn-default btn-mini" data-bind="css: { active: timeWindow() === '1min' }, click: function() { setTimeWindow('1min'); }">1 min</button>
         <button type="button" class="btn btn-default btn-mini" data-bind="css: { active: timeWindow() === '5min' }, click: function() { setTimeWindow('5min'); }">5 min</button>
         <button type="button" class="btn btn-default btn-mini" data-bind="css: { active: timeWindow() === '30min' }, click: function() { setTimeWindow('30min'); }">30 min</button>
     </div><br>
-    <div id="fanrpm-graph" style="width: 100%; height: 150px; margin-bottom: 8px;"></div>
-    Average: <strong><span data-bind="text: averageRPM, css: averageRPMStatusClass"></span> <span data-bind="css: averageRPMStatusClass">RPM</span></strong><br>
-    Min: <strong><span data-bind="text: minRPM, css: minRPMStatusClass"></span> <span data-bind="css: minRPMStatusClass">RPM</span></strong><br>
-    Max: <strong><span data-bind="text: maxRPM, css: maxRPMStatusClass"></span> <span data-bind="css: maxRPMStatusClass">RPM</span></strong>
+    <div style="position: relative; width: 100%; height: 150px; margin-bottom: 8px;">
+        <div id="fanrpm-graph" style="width: 100%; height: 100%;"></div>
+        <div class="fanrpm-stats-overlay">
+            Avg: <strong><span data-bind="text: averageRPM, css: averageRPMStatusClass"></span></strong>
+            Min: <strong><span data-bind="text: minRPM, css: minRPMStatusClass"></span></strong>
+            Max: <strong><span data-bind="text: maxRPM, css: maxRPMStatusClass"></span></strong>
+        </div>
+    </div>
 
     <style>
         .fanrpm-sidebar .rpm-status-ok {
@@ -42,6 +46,18 @@
         /* No spin for 0 RPM */
         .fanrpm-sidebar .fan-spin-stop {
             /* no animation */
+        }
+
+        /* Statistics overlay on graph */
+        .fanrpm-sidebar .fanrpm-stats-overlay {
+            position: absolute;
+            bottom: 30px;
+            left: 35px;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            line-height: 1.4;
+            pointer-events: none;
         }
     </style>
 </div>

@@ -7,15 +7,12 @@ $(function() {
         self.settings = parameters[0];
         self.currentRPM = ko.observable(0);
 
-        // Aggregated statistics instead of full history
-        self.minRPMValue = ko.observable(null);
-        self.minRPMTime = ko.observable(null);
-        self.maxRPMValue = ko.observable(null);
-        self.maxRPMTime = ko.observable(null);
-        self.sumRPM = ko.observable(0);
-        self.countRPM = ko.observable(0);
+        // Rolling window for last 30 minutes (900 readings at 2s interval)
+        self.rpmHistory = ko.observableArray([]);
+        self.maxHistorySize = 900; // 30 minutes * 60 seconds / 2 second interval
 
-        self.currentTime = ko.observable(new Date());
+        // Time window selection
+        self.timeWindow = ko.observable("1min"); // "1min", "5min", "30min"
 
         // Format RPM with thousands separator
         self.formattedRPM = ko.pureComputed(function() {
@@ -40,84 +37,114 @@ $(function() {
             return "rpm-status-ok fan-spin-ok";
         });
 
+        // Get filtered data based on time window
+        self.getFilteredData = function() {
+            var history = self.rpmHistory();
+            var window = self.timeWindow();
+            var now = new Date();
+            var cutoffTime;
+
+            if (window === "1min") {
+                cutoffTime = new Date(now - 60 * 1000);
+            } else if (window === "5min") {
+                cutoffTime = new Date(now - 5 * 60 * 1000);
+            } else { // 30min
+                cutoffTime = new Date(now - 30 * 60 * 1000);
+            }
+
+            return history.filter(function(entry) {
+                return entry.time >= cutoffTime;
+            });
+        };
+
         // Statistics
         self.averageRPM = ko.pureComputed(function() {
-            var count = self.countRPM();
-            var sum = self.sumRPM();
-            if (count === 0) return "0";
-            return Math.round(sum / count).toLocaleString();
+            var filtered = self.getFilteredData();
+            self.timeWindow(); // Track dependency
+
+            if (filtered.length === 0) return "0";
+
+            var sum = filtered.reduce(function(acc, entry) {
+                return acc + entry.rpm;
+            }, 0);
+
+            return Math.round(sum / filtered.length).toLocaleString();
         });
 
         self.minRPM = ko.pureComputed(function() {
-            var minVal = self.minRPMValue();
-            if (minVal === null) return "0";
-            return minVal.toLocaleString();
+            var filtered = self.getFilteredData();
+            self.timeWindow(); // Track dependency
+
+            if (filtered.length === 0) return "0";
+
+            var min = Math.min.apply(null, filtered.map(function(entry) {
+                return entry.rpm;
+            }));
+
+            return min.toLocaleString();
         });
 
         self.maxRPM = ko.pureComputed(function() {
-            var maxVal = self.maxRPMValue();
-            if (maxVal === null) return "0";
-            return maxVal.toLocaleString();
+            var filtered = self.getFilteredData();
+            self.timeWindow(); // Track dependency
+
+            if (filtered.length === 0) return "0";
+
+            var max = Math.max.apply(null, filtered.map(function(entry) {
+                return entry.rpm;
+            }));
+
+            return max.toLocaleString();
         });
 
-        // Helper function to format relative time
-        function formatRelativeTime(date) {
-            var now = new Date();
-            var diffMs = now - date;
-            var diffSecs = Math.floor(diffMs / 1000);
-            var diffMins = Math.floor(diffSecs / 60);
-            var diffHours = Math.floor(diffMins / 60);
-            var diffDays = Math.floor(diffHours / 24);
-            var diffWeeks = Math.floor(diffDays / 7);
-            var diffMonths = Math.floor(diffDays / 30);
-            var diffYears = Math.floor(diffDays / 365);
+        // Status classes for statistics (only show color for warnings/errors)
+        self.averageRPMStatusClass = ko.pureComputed(function() {
+            var filtered = self.getFilteredData();
+            if (filtered.length === 0) return "rpm-status-danger";
 
-            if (diffSecs < 1) {
-                return "now";
-            } else if (diffSecs < 60) {
-                return diffSecs + " second" + (diffSecs !== 1 ? "s" : "") + " ago";
-            } else if (diffMins < 60) {
-                return diffMins + " minute" + (diffMins !== 1 ? "s" : "") + " ago";
-            } else if (diffHours < 24) {
-                return diffHours + " hour" + (diffHours !== 1 ? "s" : "") + " ago";
-            } else if (diffDays < 7) {
-                return diffDays + " day" + (diffDays !== 1 ? "s" : "") + " ago";
-            } else if (diffWeeks < 4) {
-                return diffWeeks + " week" + (diffWeeks !== 1 ? "s" : "") + " ago";
-            } else if (diffMonths < 12) {
-                return diffMonths + " month" + (diffMonths !== 1 ? "s" : "") + " ago";
-            } else {
-                return diffYears + " year" + (diffYears !== 1 ? "s" : "") + " ago";
-            }
-        }
+            var sum = filtered.reduce(function(acc, entry) {
+                return acc + entry.rpm;
+            }, 0);
+            var avg = sum / filtered.length;
 
-        self.minRPMTimeFormatted = ko.pureComputed(function() {
-            var time = self.minRPMTime();
-            if (!time) return "";
-            // Access currentTime to trigger recomputation
-            self.currentTime();
-            return " (" + formatRelativeTime(time) + ")";
+            if (avg === 0) return "rpm-status-danger";
+            if (avg < 500) return "rpm-status-danger";
+            if (avg < 1000) return "rpm-status-warning";
+            return "";
         });
 
-        self.maxRPMTimeFormatted = ko.pureComputed(function() {
-            var time = self.maxRPMTime();
-            if (!time) return "";
-            // Access currentTime to trigger recomputation
-            self.currentTime();
-            return " (" + formatRelativeTime(time) + ")";
+        self.minRPMStatusClass = ko.pureComputed(function() {
+            var filtered = self.getFilteredData();
+            if (filtered.length === 0) return "rpm-status-danger";
+
+            var min = Math.min.apply(null, filtered.map(function(entry) {
+                return entry.rpm;
+            }));
+
+            if (min === 0) return "rpm-status-danger";
+            if (min < 500) return "rpm-status-danger";
+            if (min < 1000) return "rpm-status-warning";
+            return "";
         });
 
-        self.minRPMTimeAbsolute = ko.pureComputed(function() {
-            var time = self.minRPMTime();
-            if (!time) return "";
-            return time.toLocaleString();
+        self.maxRPMStatusClass = ko.pureComputed(function() {
+            var filtered = self.getFilteredData();
+            if (filtered.length === 0) return "rpm-status-danger";
+
+            var max = Math.max.apply(null, filtered.map(function(entry) {
+                return entry.rpm;
+            }));
+
+            if (max === 0) return "rpm-status-danger";
+            if (max < 500) return "rpm-status-danger";
+            if (max < 1000) return "rpm-status-warning";
+            return "";
         });
 
-        self.maxRPMTimeAbsolute = ko.pureComputed(function() {
-            var time = self.maxRPMTime();
-            if (!time) return "";
-            return time.toLocaleString();
-        });
+        // Set time window
+        self.setTimeWindow = function(window) {
+            self.timeWindow(window);
+        };
 
         // Handle messages from plugin
         self.onDataUpdaterPluginMessage = function(plugin, data) {
@@ -131,20 +158,15 @@ $(function() {
 
                 self.currentRPM(rpm);
 
-                // Update aggregated statistics
-                self.sumRPM(self.sumRPM() + rpm);
-                self.countRPM(self.countRPM() + 1);
+                // Add to rolling window
+                self.rpmHistory.push({
+                    rpm: rpm,
+                    time: now
+                });
 
-                // Update min
-                if (self.minRPMValue() === null || rpm < self.minRPMValue()) {
-                    self.minRPMValue(rpm);
-                    self.minRPMTime(now);
-                }
-
-                // Update max
-                if (self.maxRPMValue() === null || rpm > self.maxRPMValue()) {
-                    self.maxRPMValue(rpm);
-                    self.maxRPMTime(now);
+                // Trim to max size (keep last 30 minutes)
+                if (self.rpmHistory().length > self.maxHistorySize) {
+                    self.rpmHistory.shift();
                 }
             }
         };
@@ -172,11 +194,6 @@ $(function() {
         self.onStartup = function() {
             console.log("FanRPM: ViewModel started");
             self.requestRPM();
-
-            // Update current time every second to refresh relative timestamps
-            setInterval(function() {
-                self.currentTime(new Date());
-            }, 1000);
         };
     }
 

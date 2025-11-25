@@ -1,8 +1,14 @@
 <div id="sidebar_plugin_fanrpm" class="fanrpm-sidebar">
     Current: <i class="fa fa-fan" data-bind="css: fanIconClass"></i> <strong><span data-bind="text: formattedRPM, css: rpmStatusClass"></span> <span data-bind="css: rpmStatusClass">RPM</span></strong><br>
-    Average: <strong><span data-bind="text: averageRPM"></span> RPM</strong><br>
-    Min: <strong><span data-bind="text: minRPM"></span> RPM</strong><span data-bind="text: minRPMTimeFormatted, attr: {title: minRPMTimeAbsolute}"></span><br>
-    Max: <strong><span data-bind="text: maxRPM"></span> RPM</strong><span data-bind="text: maxRPMTimeFormatted, attr: {title: maxRPMTimeAbsolute}"></span>
+    <hr style="margin: 8px 0;">
+    <div class="btn-group btn-group-xs" data-toggle="buttons-radio" style="margin-bottom: 8px;">
+        <button type="button" class="btn btn-default btn-mini" data-bind="css: { active: timeWindow() === '1min' }, click: function() { setTimeWindow('1min'); }">1 min</button>
+        <button type="button" class="btn btn-default btn-mini" data-bind="css: { active: timeWindow() === '5min' }, click: function() { setTimeWindow('5min'); }">5 min</button>
+        <button type="button" class="btn btn-default btn-mini" data-bind="css: { active: timeWindow() === '30min' }, click: function() { setTimeWindow('30min'); }">30 min</button>
+    </div><br>
+    Average: <strong><span data-bind="text: averageRPM, css: averageRPMStatusClass"></span> <span data-bind="css: averageRPMStatusClass">RPM</span></strong><br>
+    Min: <strong><span data-bind="text: minRPM, css: minRPMStatusClass"></span> <span data-bind="css: minRPMStatusClass">RPM</span></strong><br>
+    Max: <strong><span data-bind="text: maxRPM, css: maxRPMStatusClass"></span> <span data-bind="css: maxRPMStatusClass">RPM</span></strong>
 
     <style>
         .fanrpm-sidebar .rpm-status-ok {
